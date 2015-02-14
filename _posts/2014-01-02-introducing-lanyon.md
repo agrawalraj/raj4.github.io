@@ -1,7 +1,9 @@
 ---
 layout: post
-title: Introducing Lanyon
+title: Introducing Bigbang
 ---
+
+BigBang is a toolkit for studying communications data from collaborative projects. It currently supports analyzing mailing lists from Sourceforge, Mailman, or .mbox files.
 
 Lanyon is an unassuming [Jekyll](http://jekyllrb.com) theme that places content first by tucking away navigation in a hidden drawer. It's based on [Poole](http://getpoole.com), the Jekyll butler.
 

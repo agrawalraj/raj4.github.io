@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Introducing Bigbang
+title: Title
 ---
 
 Add Content

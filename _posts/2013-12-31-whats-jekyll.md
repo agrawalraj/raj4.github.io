@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Title?
+title: Title
 ---
 
 Add content

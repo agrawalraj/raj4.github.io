@@ -4,13 +4,147 @@
  <title>Raj Agrawal</title>
  <link href="http://raj4.github.io/atom.xml" rel="self"/>
  <link href="http://raj4.github.io/"/>
- <updated>2015-02-14T14:33:02-08:00</updated>
+ <updated>2015-02-28T02:13:25-08:00</updated>
  <id>http://raj4.github.io</id>
  <author>
    <name>Raj Agrawal</name>
    <email>r.agrawal@berkeley.edu</email>
  </author>
 
+ 
+ <entry>
+   <title>Testing d3 with Markdown</title>
+   <link href="http://raj4.github.io/2015/02/27/d3-visual/"/>
+   <updated>2015-02-27T05:12:00-08:00</updated>
+   <id>http://raj4.github.io/2015/02/27/d3-visual</id>
+   <content type="html">&lt;!-- POST TAKEN VERBATIM FROM [d3 with Markdown](http://www.nicksuch.com/2014/03/26/d3-sample/). 
+This is from a [Stack Overflow question](http://stackoverflow.com/questions/22651346/how-to-embed-a-d3-js-example-to-the-jekyll-blog-post) about embedding a d3.js example in a Jekyll blog post (written in Markdown).
+
+This should work, but it looks like the challenge from the [referenced d3 example](http://bl.ocks.org/mbostock/4061502) is have a proper target element in the document. The example uses an `&lt;iframe&gt;` element, which embeds another HTML document where the target element is `&lt;body&gt;`. Here, I&#39;ve embedded the same iframe: --&gt;
+
+&lt;iframe src=&quot;http://bl.ocks.org/mbostock/raw/9539958/&quot; width=&quot;600&quot; height=&quot;400&quot; marginwidth=&quot;0&quot; marginheight=&quot;0&quot; scrolling=&quot;no&quot;&gt;&lt;/iframe&gt;
+
+&lt;!-- And here, I&#39;ve used d3 to target an element `&lt;div id=&quot;example&quot;&gt;` in this document: --&gt;
+
+&lt;style&gt;
+
+div.example {
+  font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif;
+}
+
+.box {
+  font: 10px sans-serif;
+}
+
+.box line,
+.box rect,
+.box circle {
+  fill: #fff;
+  stroke: #000;
+  stroke-width: 1.5px;
+}
+
+.box .center {
+  stroke-dasharray: 3,3;
+}
+
+.box .outlier {
+  fill: none;
+  stroke: #ccc;
+}
+
+&lt;/style&gt;
+
+&lt;script src=&quot;http://d3js.org/d3.v3.min.js&quot;&gt;&lt;/script&gt;
+
+&lt;script src=&quot;http://bl.ocks.org/mbostock/raw/4061502/0a200ddf998aa75dfdb1ff32e16b680a15e5cb01/box.js&quot;&gt;&lt;/script&gt;
+
+&lt;script&gt;
+
+var margin = {top: 10, right: 50, bottom: 20, left: 50},
+    width = 120 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+var min = Infinity,
+    max = -Infinity;
+
+var chart = d3.box()
+    .whiskers(iqr(1.5))
+    .width(width)
+    .height(height);
+
+d3.csv(&quot;/morley.csv&quot;, function(error, csv) {
+  var data = [];
+
+  csv.forEach(function(x) {
+    var e = Math.floor(x.Expt - 1),
+        r = Math.floor(x.Run - 1),
+        s = Math.floor(x.Speed),
+        d = data[e];
+    if (!d) d = data[e] = [s];
+    else d.push(s);
+    if (s &gt; max) max = s;
+    if (s &lt; min) min = s;
+  });
+
+  chart.domain([min, max]);
+
+  var svg = d3.select(&quot;div#example&quot;).selectAll(&quot;svg&quot;)
+      .data(data)
+    .enter().append(&quot;svg&quot;)
+      .attr(&quot;class&quot;, &quot;box&quot;)
+      .attr(&quot;width&quot;, width + margin.left + margin.right)
+      .attr(&quot;height&quot;, height + margin.bottom + margin.top)
+    .append(&quot;g&quot;)
+      .attr(&quot;transform&quot;, &quot;translate(&quot; + margin.left + &quot;,&quot; + margin.top + &quot;)&quot;)
+      .call(chart);
+
+  setInterval(function() {
+    svg.datum(randomize).call(chart.duration(1000));
+  }, 2000);
+});
+
+function randomize(d) {
+  if (!d.randomizer) d.randomizer = randomizer(d);
+  return d.map(d.randomizer);
+}
+
+function randomizer(d) {
+  var k = d3.max(d) * .02;
+  return function(d) {
+    return Math.max(min, Math.min(max, d + k * (Math.random() - .5)));
+  };
+}
+
+// Returns a function to compute the interquartile range.
+function iqr(k) {
+  return function(d, i) {
+    var q1 = d.quartiles[0],
+        q3 = d.quartiles[2],
+        iqr = (q3 - q1) * k,
+        i = -1,
+        j = d.length;
+    while (d[++i] &lt; q1 - iqr);
+    while (d[--j] &gt; q3 + iqr);
+    return [i, j];
+  };
+}
+
+&lt;/script&gt;
+
+&lt;div id=&quot;example&quot;&gt;&lt;/div&gt;
+
+&lt;!-- To do this, I made the following changes:
+
+- change `var svg = d3.select(&quot;body&quot;).selectAll(&quot;svg&quot;)` to `var svg = d3.select(&quot;div#example&quot;).selectAll(&quot;svg&quot;)`
+- save `morley.csv` to the root directory of my Jekyll site, then change `d3.csv(&quot;morley.csv&quot;, function(error, csv)` to `d3.csv(&quot;/morley.csv&quot;, function(error, csv)` (copied this file into project to resolve cross-site scripting errors)
+- change `&lt;script src=&quot;box.js&quot;&gt;&lt;/script&gt;` to `&lt;script src=&quot;http://bl.ocks.org/mbostock/raw/4061502/0a200ddf998aa75dfdb1ff32e16b680a15e5cb01/box.js&quot;&gt;&lt;/script&gt;`
+- create a new element called `&lt;div id=&quot;example&quot;&gt;&lt;/div&gt;`
+
+Check out [the code for this post on GitHub](https://raw.githubusercontent.com/nicksuch/nicksuch.github.io/master/_posts/2014-03-26-d3-sample.md) to see how I did it!
+ --&gt;
+</content>
+ </entry>
  
  <entry>
    <title>Introducing BigBang</title>
